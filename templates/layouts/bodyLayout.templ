@@ -1,0 +1,17 @@
+package layouts
+
+templ BodyLayout() {
+	<!DOCTYPE html>
+	<html lang="en">
+		<head>
+			<title></title>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1"/>
+			<script src="https://unpkg.com/htmx.org@1.9.8"></script>
+			<link href="/static/style-compiled.css" rel="stylesheet"/>
+		</head>
+		<body>
+			{ children... }
+		</body>
+	</html>
+}
