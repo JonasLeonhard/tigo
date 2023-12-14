@@ -7,9 +7,12 @@ import (
 	"os"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	_ "github.com/joho/godotenv/autoload"
 	"github.com/jonasleonhard/go-htmx-time/src/database/ent"
 	"github.com/jonasleonhard/go-htmx-time/src/database/ent/user"
+	"github.com/labstack/echo-contrib/session"
+	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -18,6 +21,7 @@ type Service interface {
 	Client() *ent.Client
 	CreateUser(name string, email string, age *int, ctx context.Context) (*ent.User, error)
 	GetUser(name string, ctx context.Context) (*ent.User, error)
+	GetUserFromRequestToken(c echo.Context) (*ent.User, error)
 }
 
 type service struct {
@@ -92,6 +96,37 @@ func (s *service) GetUser(name string, ctx context.Context) (*ent.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed querying user: %w", err)
 	}
+
+	return user, nil
+}
+
+// TODO: this is shared in routes.go
+// jwtCustomClaims are custom claims extending default ones.
+// See https://github.com/golang-jwt/jwt for more examples
+type jwtCustomClaims struct {
+	Name string `json:"name"`
+	jwt.RegisteredClaims
+}
+
+func (s *service) GetUserFromRequestToken(c echo.Context) (*ent.User, error) {
+	sess, err := session.Get("session", c)
+	tokenVal := sess.Values["token"]
+	if err != nil || tokenVal == nil {
+		return nil, fmt.Errorf("failed getting token from session: %w", err)
+	}
+
+	tokenStr := sess.Values["token"].(string)
+	token, err := jwt.ParseWithClaims(tokenStr, &jwtCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte("secret"), nil // TODO: use real secret here
+	})
+
+	if !token.Valid {
+		return nil, fmt.Errorf("failed parsing token - invalid: %w", err)
+	}
+
+	claims := token.Claims.(*jwtCustomClaims)
+
+	user, err := s.GetUser(claims.Name, c.Request().Context())
 
 	return user, nil
 }

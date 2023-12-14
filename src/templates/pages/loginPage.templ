@@ -1,0 +1,17 @@
+package pages
+
+import (
+	"github.com/jonasleonhard/go-htmx-time/src/templates/layouts"
+	"github.com/jonasleonhard/go-htmx-time/src/database/ent"
+)
+
+templ LoginPage(user *ent.User) {
+	@layouts.BodyLayout(user) {
+		<form method="POST" action="/user/login">
+			todo: currently register is not implemented yet.
+			<input type="text" name="username" placeholder="Username"/>
+			<input type="password" name="password" placeholder="Password"/>
+			<button type="submit">Login</button>
+		</form>
+	}
+}

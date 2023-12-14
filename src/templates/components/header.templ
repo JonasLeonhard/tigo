@@ -22,7 +22,11 @@ templ UserMenu(user *ent.User) {
  			data-dropdown-placement="bottom"
 		>
 			<span class="sr-only">Open user menu</span>
-			<img class="w-8 h-8 rounded-full" src="/static/assets/profile-placeholder.jpg" alt="user photo"/>
+			if user != nil {
+				<img class="w-8 h-8 rounded-full" src="/static/assets/profile-placeholder.jpg" alt="user photo"/>
+			} else {
+				@IconLogin()
+			}
 		</button>
 		<!-- Dropdown menu -->
 		<div
@@ -62,15 +66,27 @@ templ UserMenu(user *ent.User) {
  						class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
 					>Earnings</a>
 				</li>
-				<li>
-					<a
- 						href="#"
- 						class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-					>
-						Sign
-						out
-					</a>
-				</li>
+				if user != nil {
+					<li>
+						<a
+ 							href="/logout"
+ 							class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+						>
+							Sign
+							out
+						</a>
+					</li>
+				} else {
+					<li>
+						<a
+ 							href="/login"
+ 							class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+						>
+							Sign
+							in
+						</a>
+					</li>
+				}
 			</ul>
 		</div>
 	</div>
