@@ -1,6 +1,11 @@
 package layouts
 
-templ BodyLayout() {
+import (
+	"github.com/jonasleonhard/go-htmx-time/src/templates/components"
+	"github.com/jonasleonhard/go-htmx-time/src/database/ent"
+)
+
+templ BodyLayout(user *ent.User) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -11,7 +16,9 @@ templ BodyLayout() {
 			<link href="/static/style-compiled.css" rel="stylesheet"/>
 		</head>
 		<body>
+			@components.Header(user)
 			{ children... }
+			@components.Footer()
 		</body>
 	</html>
 }

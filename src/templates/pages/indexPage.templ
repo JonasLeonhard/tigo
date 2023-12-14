@@ -1,0 +1,10 @@
+package pages
+
+import (
+	"github.com/jonasleonhard/go-htmx-time/src/templates/layouts"
+	"github.com/jonasleonhard/go-htmx-time/src/database/ent"
+)
+
+templ IndexPage(user *ent.User) {
+	@layouts.BodyLayout(user)
+}

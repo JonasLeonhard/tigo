@@ -12,3 +12,6 @@ run:
 
 css: 
 	pnpx tailwindcss -i static/style.css -o static/style-compiled.css --minify
+
+ent: 
+	go generate ./src/database/ent
