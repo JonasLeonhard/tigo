@@ -14,14 +14,16 @@ import (
 	"github.com/labstack/echo-contrib/session"
 	"github.com/labstack/echo/v4"
 	_ "github.com/mattn/go-sqlite3"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
 	Health() map[string]string
 	Client() *ent.Client
-	CreateUser(name string, email string, age *int, ctx context.Context) (*ent.User, error)
+	CreateUser(name string, email string, password string, age *int, ctx context.Context) (*ent.User, error)
 	GetUser(name string, ctx context.Context) (*ent.User, error)
 	GetUserFromRequestToken(c echo.Context) (*ent.User, error)
+	CheckForUserLogin(c context.Context, username string, password string) bool
 }
 
 type service struct {
@@ -74,8 +76,18 @@ func (s *service) Health() map[string]string {
 }
 
 // --- Schema specific methods:
-func (s *service) CreateUser(name string, email string, age *int, ctx context.Context) (*ent.User, error) {
-	query := s.db.User.Create().SetName(name).SetEmail(email)
+func (s *service) CreateUser(name string, email string, password string, age *int, ctx context.Context) (*ent.User, error) {
+	passwordBytes := []byte(password)
+	hashedPasswordBytes, err := bcrypt.
+		GenerateFromPassword(passwordBytes, bcrypt.MinCost)
+
+	if err != nil {
+		return nil, fmt.Errorf("failed hashing password: %w", err)
+	}
+
+	hashedPassword := string(hashedPasswordBytes)
+
+	query := s.db.User.Create().SetName(name).SetEmail(email).SetPasswordHash(hashedPassword)
 
 	if age != nil {
 		query.SetAge(*age)
@@ -129,4 +141,24 @@ func (s *service) GetUserFromRequestToken(c echo.Context) (*ent.User, error) {
 	user, err := s.GetUser(claims.Name, c.Request().Context())
 
 	return user, nil
+}
+
+func (s *service) CheckForUserLogin(ctx context.Context, username string, password string) bool {
+	user, err := s.db.User.Query().Where(user.Name(username)).Only(ctx)
+
+	if err != nil {
+		return false
+	}
+
+	if user == nil {
+		return false
+	}
+
+	pwErr := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+
+	if pwErr != nil {
+		return false
+	}
+
+	return true
 }

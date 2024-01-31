@@ -73,7 +73,8 @@ func (s *Server) IndexHandler(c echo.Context) error {
 }
 
 func (s *Server) LoginHandler(c echo.Context) error {
-	component := pages.LoginPage(nil)
+	isUnauthorized := c.QueryParam("login") == "unauthorized"
+	component := pages.LoginPage(nil, isUnauthorized)
 
 	return asHtml(c, component)
 }
@@ -82,8 +83,7 @@ func (s *Server) UserLoginHandler(c echo.Context) error {
 	username := c.FormValue("username")
 	password := c.FormValue("password")
 
-	// Throw unauthorized error if username & password dont match in db: TODO: implement db auth check here.
-	if username == "test" || password == "test" {
+	if !s.db.CheckForUserLogin(c.Request().Context(), username, password) {
 		return c.Redirect(http.StatusSeeOther, "/login?login=unauthorized")
 	}
 
@@ -129,7 +129,7 @@ func (s *Server) UserLogoutHandler(c echo.Context) error {
 }
 
 func (s *Server) UserRegisterHandler(c echo.Context) error {
-	user, err := s.db.CreateUser("test2", "test2@test.com", nil, c.Request().Context())
+	user, err := s.db.CreateUser("test2", "test2@test.com", "password", nil, c.Request().Context())
 
 	if err != nil {
 		log.Println(err)
@@ -140,8 +140,6 @@ func (s *Server) UserRegisterHandler(c echo.Context) error {
 }
 
 func (s *Server) UserDashboardHandler(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(*jwtCustomClaims)
-	name := claims.Name
-	return c.String(http.StatusOK, "Welcome "+name+"!")
+	user, _ := s.db.GetUserFromRequestToken(c)
+	return c.String(http.StatusOK, "Welcome "+user.Name+"!")
 }

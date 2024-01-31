@@ -17,6 +17,8 @@ const (
 	FieldName = "name"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
+	// FieldPasswordHash holds the string denoting the passwordhash field in the database.
+	FieldPasswordHash = "password_hash"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 )
@@ -27,6 +29,7 @@ var Columns = []string{
 	FieldAge,
 	FieldName,
 	FieldEmail,
+	FieldPasswordHash,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -65,4 +68,9 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByEmail orders the results by the email field.
 func ByEmail(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEmail, opts...).ToFunc()
+}
+
+// ByPasswordHash orders the results by the passwordHash field.
+func ByPasswordHash(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldPasswordHash, opts...).ToFunc()
 }
