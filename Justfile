@@ -1,4 +1,5 @@
 set shell := ["nu", "-c"]
+set dotenv-load
 
 default:
 	@just --choose
@@ -10,8 +11,14 @@ dev:
 run:
 	go run .
 
-css: 
-	pnpx tailwindcss -i static/style.css -o static/style-compiled.css --minify
+# install via templ
+templ:
+  templ generate -watch $"-proxy=http://localhost:($env.PORT)"
 
-ent: 
+# install via pnpm i -g tailwindcss
+css:
+	tailwindcss -i static/style.css -o static/style-compiled.css --minify --watch
+
+# generate db from schema changes
+ent:
 	go generate ./src/database/ent

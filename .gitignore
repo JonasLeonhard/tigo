@@ -1,2 +1,4 @@
 tmp
 .env
+/src/templates/**/*.txt
+/src/templates/**/*.go
