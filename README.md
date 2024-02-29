@@ -10,6 +10,8 @@ Features:
 
 # Starting the app:
 
+0. setup your env file from the example.env!
+
 1. watch for tailwind changes
 ```bash
 just css
