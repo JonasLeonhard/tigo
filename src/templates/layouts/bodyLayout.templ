@@ -1,24 +1,27 @@
 package layouts
 
 import (
-	"github.com/jonasleonhard/go-htmx-time/src/templates/components"
-	"github.com/jonasleonhard/go-htmx-time/src/database/ent"
+"github.com/jonasleonhard/go-htmx-time/src/templates/components"
+"github.com/jonasleonhard/go-htmx-time/src/database/ent"
 )
 
 templ BodyLayout(user *ent.User) {
-	<!DOCTYPE html>
-	<html lang="en">
-		<head>
-			<title></title>
-			<meta charset="UTF-8"/>
-			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<script src="https://unpkg.com/htmx.org@1.9.8"></script>
-			<link href="/static/style-compiled.css" rel="stylesheet"/>
-		</head>
-		<body>
-			@components.Header(user)
-			{ children... }
-			@components.Footer()
-		</body>
-	</html>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <title></title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://unpkg.com/htmx.org@1.9.8"></script>
+  <link href="/static/style-compiled.css" rel="stylesheet" />
+</head>
+
+<body>
+  @components.Header(user)
+  { children... }
+  @components.Footer()
+</body>
+
+</html>
 }
