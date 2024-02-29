@@ -1,10 +1,12 @@
 # About
-a timetracking webapp using go and htmx
+Tigo. A work in progress local timetracking webapp using go and htmx
 
 Features:
 
 - Track your time
 - The time is stored in a local sqlite file
+
+![register](./static/assets/readme_register.png)
 
 # Starting the app:
 

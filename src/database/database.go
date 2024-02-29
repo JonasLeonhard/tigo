@@ -21,9 +21,9 @@ type Service interface {
 	Health() map[string]string
 	Client() *ent.Client
 	CreateUser(name string, email string, password string, age *int, ctx context.Context) (*ent.User, error)
-	GetUser(name string, ctx context.Context) (*ent.User, error)
+	GetUser(email string, ctx context.Context) (*ent.User, error)
 	GetUserFromRequestToken(c echo.Context) (*ent.User, error)
-	CheckForUserLogin(c context.Context, username string, password string) bool
+	CheckForUserLogin(c context.Context, email string, password string) bool
 }
 
 type service struct {
@@ -102,8 +102,8 @@ func (s *service) CreateUser(name string, email string, password string, age *in
 	return user, nil
 }
 
-func (s *service) GetUser(name string, ctx context.Context) (*ent.User, error) {
-	user, err := s.db.User.Query().Where(user.Name(name)).Only(ctx)
+func (s *service) GetUser(email string, ctx context.Context) (*ent.User, error) {
+	user, err := s.db.User.Query().Where(user.Email(email)).Only(ctx)
 
 	if err != nil {
 		return nil, fmt.Errorf("failed querying user: %w", err)
@@ -116,7 +116,7 @@ func (s *service) GetUser(name string, ctx context.Context) (*ent.User, error) {
 // jwtCustomClaims are custom claims extending default ones.
 // See https://github.com/golang-jwt/jwt for more examples
 type jwtCustomClaims struct {
-	Name string `json:"name"`
+	Email string `json:"email"`
 	jwt.RegisteredClaims
 }
 
@@ -138,14 +138,15 @@ func (s *service) GetUserFromRequestToken(c echo.Context) (*ent.User, error) {
 
 	claims := token.Claims.(*jwtCustomClaims)
 
-	user, err := s.GetUser(claims.Name, c.Request().Context())
+	user, err := s.GetUser(claims.Email, c.Request().Context())
 
 	return user, nil
 }
 
-func (s *service) CheckForUserLogin(ctx context.Context, username string, password string) bool {
-	user, err := s.db.User.Query().Where(user.Name(username)).Only(ctx)
+func (s *service) CheckForUserLogin(ctx context.Context, email string, password string) bool {
+	user, err := s.db.User.Query().Where(user.Email(email)).Only(ctx)
 
+  log.Println("debug:", email, password, user, err)
 	if err != nil {
 		return false
 	}

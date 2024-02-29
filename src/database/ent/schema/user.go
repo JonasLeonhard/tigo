@@ -15,7 +15,7 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("age").Positive().Optional(),
 		field.String("name"),
-		field.String("email"),
+		field.String("email").Unique(),
 		field.String("passwordHash"),
 	}
 }
